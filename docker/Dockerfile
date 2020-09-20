@@ -6,17 +6,18 @@ LABEL cce.git.repository="https://github.com/cceshop/customer-check-birthnumber.
 LABEL cce.quay.repository="https://quay.io/repository/cceshop/customer-check-birthnumber"
 
 ONBUILD USER root
-RUN useradd -ms /bin/bash cce \
+RUN adduser --disabled-password --gecos '' -s /bin/bash cce \
     && mkdir -p /app
 COPY ./entrypoint.sh /app
 COPY ./api.go /app
 RUN chmod +x /app/entrypoint.sh \ 
     && apk add git tini \
     && go get github.com/gorilla/mux \
-    && chown -R cce:cce /app
+    && chown -R cce:cce /app 
 
 USER cce
 WORKDIR /app
 
-ENTRYPOINT ["/tini", "--"]
+EXPOSE 8080
+ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["/app/entrypoint.sh"]
